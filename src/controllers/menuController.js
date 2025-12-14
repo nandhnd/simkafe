@@ -10,9 +10,12 @@ export default {
     try {
       const { name, description, price, category } = req.body;
 
-      const imageUrl = req.file
-        ? "/" + req.file.path.replace(/\\/g, "/")
-        : null;
+      let imageUrl = null;
+
+      if (req.file) {
+        const baseUrl = `${req.protocol}://${req.get("host")}`;
+        imageUrl = `${baseUrl}/uploads/menus/${req.file.filename}`;
+      }
 
       const newMenu = await Menu.create({
         name,
@@ -59,7 +62,7 @@ export default {
   // UPDATE
   async updateMenu(req, res) {
     try {
-      const { name, description, price, category } = req.body;
+      const { name, description, price, category, isAvailable } = req.body;
       const { id } = req.params;
 
       const menu = await Menu.findByPk(id);
@@ -77,8 +80,8 @@ export default {
           });
         }
 
-        // Set image baru
-        imageUrl = "/" + req.file.path.replace(/\\/g, "/");
+        const baseUrl = `${req.protocol}://${req.get("host")}`;
+        imageUrl = `${baseUrl}/uploads/menus/${req.file.filename}`;
       }
 
       await menu.update({
@@ -87,6 +90,7 @@ export default {
         price,
         category,
         imageUrl,
+        isAvailable,
       });
 
       res.json({

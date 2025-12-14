@@ -65,6 +65,10 @@ export default {
         return res.status(401).json({ message: "Wrong password" });
       }
 
+      if (!user.isActive) {
+        return res.status(403).json({ message: "Pengguna tidak aktif" });
+      }
+
       const token = generateToken(user);
 
       return res.status(200).json({
